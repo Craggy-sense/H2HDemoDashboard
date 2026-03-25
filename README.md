@@ -1,16 +1,55 @@
-# React + Vite
+# H2H Monitoring Dashboard — Faulu Kenya
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, high-performance monitoring interactive dashboard migrated from legacy vanilla HTML/JS to a robust **React + Vite** architecture. This dashboard provides real-time visibility into Host-to-Host (H2H) transaction processing for Faulu Kenya.
 
-Currently, two official plugins are available:
+![Dashboard Preview](https://raw.githubusercontent.com/Craggy-sense/H2HDemoDashboard/main/src/assets/faulu_logo.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Features
 
-## React Compiler
+- **Real-time Transaction Monitoring**: Live tracking of RTGS, EFT, Internal, Mpesa, and Pesalink transactions.
+- **Dynamic Filtering**: Advanced search by Reference ID and filtering by Transaction Type, Status, and Period.
+- **Interactive Analytics**: 7-day transaction volume trend charts powered by `react-chartjs-2`.
+- **Pixel-Perfect UI**: Premium design system with Faulu Kenya official branding, collapsible sidebar, and responsive layout.
+- **Notification System**: Built-in alert dropdown for system events and processing status.
+- **CSV Export**: Dynamic export of filtered transaction reports for reconciliation.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Tech Stack
 
-## Expanding the ESLint configuration
+- **Framework**: React 18
+- **Build Tool**: Vite
+- **Routing**: React Router Dom
+- **Icons**: Lucide React
+- **Charts**: Chart.js / React Chartjs 2
+- **Styling**: Vanilla CSS with custom design tokens
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📦 Getting Started
+
+### Prerequisites
+
+- Node.js (v16.x or later)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Craggy-sense/H2HDemoDashboard.git
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## 🎨 Branding
+
+This project strictly adheres to the **Faulu Kenya** corporate identity:
+- **Primary Color**: `#632468` (Faulu Purple)
+- **Secondary Color**: `#F37021` (Faulu Orange)
+- **Official Logo**: Integrated into the sidebar and main portal header.
+
+---
+Developed for **NLS Tech Solutions Ltd**
