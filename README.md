@@ -1,4 +1,7 @@
-# H2H Monitoring Dashboard — Faulu Kenya
+# H2H Monitoring Dashboard — Faulu Kenya (Demo)
+
+> [!NOTE]
+> This is a **Functional Demo** and Proof-of-Concept developed to showcase the modernized H2H monitoring capabilities for Faulu Kenya.
 
 A modern, high-performance monitoring interactive dashboard migrated from legacy vanilla HTML/JS to a robust **React + Vite** architecture. This dashboard provides real-time visibility into Host-to-Host (H2H) transaction processing for Faulu Kenya.
 
