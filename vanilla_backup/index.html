@@ -1,0 +1,2557 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>H2H Dashboard — Faulu Kenya</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            /* ── Faulu Kenya 60-30-10 Brand Palette ── */
+            /* 30% Secondary: Deep Faulu Purple for strong anchoring (Sidebar, Header, Footer) */
+            --navy: #4F2684;
+            /* Faulu Primary Purple */
+            --navy-mid: #3A1B68;
+            /* Darker shade for gradients/hover */
+
+            /* 10% Accent: Bright Orange for CTAs and highlights */
+            --blue: #F37021;
+            /* Faulu Orange (Accent) */
+            --blue-hover: #D9601A;
+            /* Darker Orange for hover */
+            --blue-light: #FBC39C;
+            /* Light orange for soft highlights */
+            --blue-pale: #FEF4ED;
+            /* Very pale orange for badges/bg */
+
+            --gold: #F37021;
+            /* using orange for gold mappings */
+            --gold-light: #FBC39C;
+            --red-accent: #DC2626;
+
+            /* 60% Dominant: White & Light Backgrounds for clean vast canvas */
+            --bg: #F8F9FB;
+            /* Off-white background canvas */
+            --surface: #FFFFFF;
+            /* Pure white panels */
+            --card: #FFFFFF;
+            --sidebar-bg: #4F2684;
+            --sidebar-w: 256px;
+            --border: #E5E7EB;
+            /* Soft gray borders */
+            --border-dark: rgba(255, 255, 255, 0.15);
+
+            /* Text Colors */
+            --text: #1F2937;
+            /* Near black for readability */
+            --text-mid: #4B5563;
+            --text-muted: #6B7280;
+
+            /* Status Colors */
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #8B5CF6;
+            /* Soft purple for info */
+
+            --shadow-sm: 0 1px 3px rgba(79, 38, 132, 0.08);
+            --shadow-md: 0 4px 12px rgba(79, 38, 132, 0.12);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .section-label,
+        .kpi-val,
+        .logo-text .ln {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* ════════════════════════════════
+       SIDEBAR
+    ════════════════════════════════ */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 200;
+            border-right: 1px solid var(--border);
+            transition: width 0.28s ease;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: 62px;
+        }
+
+        /* Logo */
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 14px;
+            height: 68px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .faulu-logo-svg {
+            width: 32px;
+            height: 38px;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        .logo-text {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .logo-text .ln {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: .3px;
+        }
+
+        .logo-text .ln em {
+            color: var(--gold);
+            font-style: normal;
+        }
+
+        .logo-text .ls {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* Nav */
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.6rem 0;
+            scrollbar-width: none;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-group-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 0.8rem 16px 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .collapsed .nav-group-label {
+            opacity: 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 0.65rem 14px;
+            margin: 2px 8px;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            white-space: nowrap;
+            user-select: none;
+            position: relative;
+            color: var(--text-mid);
+        }
+
+        .nav-item:hover {
+            background: var(--blue-pale);
+            color: var(--navy);
+        }
+
+        .nav-item.active {
+            background: var(--blue-pale);
+            color: var(--blue);
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        .nav-item.active .nav-icon {
+            opacity: 1;
+            color: var(--blue);
+        }
+
+        .nav-icon {
+            font-size: 1rem;
+            opacity: .8;
+            flex-shrink: 0;
+            width: 22px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .nav-label {
+            font-size: 0.845rem;
+            color: inherit;
+            overflow: hidden;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 2px 7px;
+            flex-shrink: 0;
+        }
+
+        .nav-chevron {
+            margin-left: auto;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            transition: transform 0.25s;
+            flex-shrink: 0;
+        }
+
+        .nav-item.open .nav-chevron {
+            transform: rotate(90deg);
+        }
+
+        /* Tooltip for collapsed */
+        .collapsed .nav-item:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: 64px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--blue);
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Sub-menu */
+        .sub-menu {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.28s ease;
+        }
+
+        .sub-menu.open {
+            max-height: 260px;
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 0.52rem 14px 0.52rem 2.6rem;
+            margin: 1px 8px;
+            border-radius: 8px;
+            font-size: 0.81rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            white-space: nowrap;
+        }
+
+        .sub-item:hover {
+            background: var(--blue-pale);
+            color: var(--navy);
+        }
+
+        .sub-item.active {
+            color: var(--blue);
+            font-weight: 600;
+        }
+
+        .sub-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+        }
+
+        /* Footer */
+        .sidebar-foot {
+            border-top: 1px solid var(--border);
+            padding: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Toggle btn */
+        .toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: calc(var(--sidebar-w) - 13px);
+            width: 26px;
+            height: 26px;
+            background: var(--blue);
+            border: 2px solid var(--bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.65rem;
+            color: #fff;
+            z-index: 300;
+            transition: left 0.28s;
+            box-shadow: 0 2px 8px rgba(40, 105, 229, 0.4);
+        }
+
+        .sidebar.collapsed~.toggle-btn {
+            left: 49px;
+        }
+
+        /* ════════════════════════════════
+       PAGE WRAPPER
+    ════════════════════════════════ */
+        .page-wrapper {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.28s;
+            min-width: 0;
+        }
+
+        /* Topbar */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            height: 64px;
+            background: rgba(79, 38, 132, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 2px solid var(--blue);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .breadcrumb {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .breadcrumb span {
+            color: var(--gold-light);
+            font-weight: 600;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.4rem;
+        }
+
+        .topbar-meta {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .live-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(22, 163, 74, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.35);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.73rem;
+            font-weight: 600;
+            color: #4ade80;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 1.6s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: .5;
+                transform: scale(1.4)
+            }
+        }
+
+        .notif-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.25rem;
+            position: relative;
+        }
+
+        .notif-btn .badge {
+            position: absolute;
+            top: -4px;
+            right: -5px;
+            background: var(--danger);
+            color: #fff;
+            font-size: 0.58rem;
+            font-weight: 700;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .topbar-clock .time {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            text-align: right;
+        }
+
+        .topbar-clock .date {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-align: right;
+            margin-top: 1px;
+        }
+
+        /* ─── CONTENT ─── */
+        .content {
+            padding: 1.6rem;
+            flex: 1;
+        }
+
+        .page-title {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .page-title h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .page-title h1 span {
+            color: var(--blue);
+        }
+
+        .page-title .sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .report-badge {
+            background: var(--blue-pale);
+            border: 1px solid var(--border);
+            color: var(--navy-mid);
+            font-size: 0.76rem;
+            font-weight: 600;
+            padding: 5px 13px;
+            border-radius: 8px;
+        }
+
+        .report-meta {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* KPI */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .kpi-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 4px 12px rgba(19, 18, 31, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(19, 18, 31, 0.1);
+        }
+
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            border-radius: 13px 0 0 13px;
+        }
+
+        .kpi-card.s::after {
+            background: var(--success);
+        }
+
+        .kpi-card.d::after {
+            background: var(--danger);
+        }
+
+        .kpi-card.w::after {
+            background: var(--warning);
+        }
+
+        .kpi-card.i::after {
+            background: var(--info);
+        }
+
+        .kpi-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon.s {
+            background: #DCFCE7;
+        }
+
+        .kpi-icon.d {
+            background: #FEE2E2;
+        }
+
+        .kpi-icon.w {
+            background: #FEF3C7;
+        }
+
+        .kpi-icon.i {
+            background: var(--blue-pale);
+        }
+
+        .kpi-lbl {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .kpi-val {
+            font-size: 1.9rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-top: 2px;
+        }
+
+        .kpi-val.s {
+            color: var(--success)
+        }
+
+        .kpi-val.d {
+            color: var(--danger)
+        }
+
+        .kpi-val.w {
+            color: var(--warning)
+        }
+
+        .kpi-val.i {
+            color: var(--info)
+        }
+
+        /* Section label */
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* TX Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tx-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .tx-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tx-card.total {
+            border-top: 3px solid var(--gold);
+        }
+
+        .tx-card.rtgs {
+            border-top: 3px solid var(--blue);
+        }
+
+        .tx-card.eft {
+            border-top: 3px solid var(--navy-mid);
+        }
+
+        .tx-card.int {
+            border-top: 3px solid var(--blue-light);
+        }
+
+        .tx-card.mpesa {
+            border-top: 3px solid #16A34A;
+        }
+
+        .tx-card.pesa {
+            border-top: 3px solid var(--red-accent);
+        }
+
+        .tx-hdr {
+            background: linear-gradient(90deg, var(--navy), var(--navy-mid));
+            padding: .8rem 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tx-card.total .tx-hdr {
+            background: linear-gradient(90deg, #2A1F00, #5A3E07);
+        }
+
+        .tx-card.mpesa .tx-hdr {
+            background: linear-gradient(90deg, #064E3B, #065F46);
+        }
+
+        .tx-card.pesa .tx-hdr {
+            background: linear-gradient(90deg, #7F1D1D, #991B1B);
+        }
+
+        .tx-hdr-title {
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .tx-hdr-icon {
+            font-size: 1.05rem;
+            opacity: .9;
+        }
+
+        .tx-body {
+            padding: .8rem 1.1rem;
+        }
+
+        .tx-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .42rem 0;
+            border-bottom: 1px solid #F1F5FB;
+            font-size: .83rem;
+        }
+
+        .tx-row:last-child {
+            border-bottom: none;
+        }
+
+        .tx-label {
+            color: var(--text-muted);
+        }
+
+        .tx-val {
+            font-weight: 700;
+            font-size: .87rem;
+        }
+
+        .tx-val.s {
+            color: #16A34A;
+        }
+
+        .tx-val.d {
+            color: #DC2626;
+        }
+
+        .tx-val.q,
+        .tx-val.p {
+            color: #6B7DAE;
+        }
+
+        /* Bottom row — 50 / 50 split */
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.3rem;
+            align-items: start;
+        }
+
+        .chart-box,
+        .table-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 1.2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-box {
+            display: flex;
+            flex-direction: column;
+            height: 420px;
+        }
+
+        .chart-box canvas {
+            width: 100% !important;
+            height: 320px !important;
+            max-height: 320px;
+            flex: 0 0 auto;
+        }
+
+        #drillTrendChart {
+            width: 100% !important;
+            height: 180px !important;
+            max-height: 180px;
+        }
+
+        #kpiTrendChart {
+            width: 100% !important;
+            height: 220px !important;
+            max-height: 220px;
+        }
+
+        .box-hdr {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .box-hdr h2 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .legend {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .leg {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .leg-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        /* Table */
+        .tx-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .8rem;
+        }
+
+        .tx-table th {
+            text-align: left;
+            padding: .5rem .75rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tx-table td {
+            padding: .55rem .75rem;
+            border-bottom: 1px solid #F0F4FB;
+        }
+
+        .tx-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tx-table tr:hover td {
+            background: var(--blue-pale);
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 20px;
+            font-size: .68rem;
+            font-weight: 700;
+        }
+
+        .pill.success {
+            background: #DCFCE7;
+            color: #15803D;
+        }
+
+        .pill.failed {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        .pill.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .pill.queued {
+            background: var(--blue-pale);
+            color: var(--blue);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.2rem;
+            background: var(--navy);
+            color: rgba(255, 255, 255, .45);
+            font-size: .73rem;
+            border-top: 3px solid var(--blue);
+        }
+
+        footer strong {
+            color: var(--gold-light);
+        }
+
+        /* Universal Log Scroll Area */
+        .log-scroll-area {
+            height: 340px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 0 0 12px 12px;
+            padding: 1rem;
+            background: #fff;
+        }
+
+        /* Filter Refinement */
+        .filter-header {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1.25rem;
+            align-items: end;
+            margin-bottom: 1.25rem;
+        }
+
+        .dashboard-filters {
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-filters .filter-group {
+            min-width: 0;
+        }
+
+        .dashboard-filters .search-box-wrapper {
+            width: 100%;
+        }
+
+        /* Prevent Safari flex shrinking issues in charts */
+        .chart-box,
+        .kpi-chart-section {
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #fff;
+            background: var(--blue);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.18s, transform 0.12s;
+            white-space: nowrap;
+            height: 36px;
+        }
+
+        .download-btn:hover {
+            background: var(--blue-hover);
+            transform: translateY(-1px);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-lbl-styled {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #6B7DAE;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .search-box-wrapper {
+            position: relative;
+            width: 320px;
+        }
+
+        .search-box-wrapper .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6B7DAE;
+            width: 16px;
+            height: 16px;
+        }
+
+        .search-input-styled {
+            width: 100%;
+            padding: 10px 12px 10px 38px;
+            border: 1px solid #D6E2F5;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--navy);
+            transition: border-color 0.2s;
+        }
+
+        .search-input-styled:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(40, 105, 229, 0.1);
+        }
+
+        .select-styled {
+            padding: 10px 12px;
+            border: 1px solid #D6E2F5;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--navy);
+            min-width: 160px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7DAE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+        }
+
+        .view-breakdown-btn {
+            background: var(--blue-pale);
+            color: var(--blue);
+            border: 1px solid rgba(40, 105, 229, 0.3);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-breakdown-btn:hover {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .search-input {
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            width: 280px;
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236B7DAE' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") no-repeat 12px center;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(40, 105, 229, 0.1);
+        }
+
+        .filter-select {
+            padding: 0.6rem 1.8rem 0.6rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: #fff;
+            color: var(--text);
+            cursor: pointer;
+            appearance: none;
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236B7DAE' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") no-repeat calc(100% - 12px) center;
+        }
+
+        /* Modal / Drill-down */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(19, 18, 31, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: flex-start;
+            /* Changed from center */
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            overflow-y: auto;
+            /* Allow scrolling the whole overlay */
+            padding: 2rem 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: var(--card);
+            width: 95%;
+            max-width: 1100px;
+            max-height: 90vh;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            margin: auto;
+            /* Centers horizontally and vertically if smaller than viewport */
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            background: var(--navy);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--blue);
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .close-modal:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            overflow-y: auto;
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+        }
+
+        .details-list {
+            list-style: none;
+        }
+
+        .details-item {
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .details-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .details-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .insights-section {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .insight-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .insight-card {
+            background: #fff;
+            padding: 0.65rem;
+            border-radius: 10px;
+            text-align: left;
+            flex: 1;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .insight-num {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--navy);
+            display: block;
+        }
+
+        .insight-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Premium Detail Groups */
+        .detail-row-premium {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .detail-group-premium {
+            background: var(--bg);
+            padding: 0.6rem 0.8rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-lbl-premium {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #6B7DAE;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .detail-val-premium {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        /* Chart Controls */
+        .chart-controls {
+            display: flex;
+            gap: 4px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .ctrl-btn {
+            padding: 4px 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .ctrl-btn.active {
+            background: #fff;
+            color: var(--blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .status-badge-large {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .status-badge-large.success {
+            background: #DCFCE7;
+            color: #15803D;
+        }
+
+        .status-badge-large.failed {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        .status-badge-large.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-badge-large.queued {
+            background: var(--blue-pale);
+            color: var(--blue);
+        }
+
+        .tx-table tbody tr {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .tx-table tbody tr:hover {
+            background: var(--blue-pale) !important;
+        }
+
+        /* KPI Drilldown 50/50 split */
+        .kpi-split-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        @media(max-width:1100px) {
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .kpi-row {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .bottom-row {
+                grid-template-columns: 1fr
+            }
+
+            .kpi-split-grid {
+                grid-template-columns: 1fr
+            }
+
+            .filter-header {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ SIDEBAR ══ -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <img class="faulu-logo-img"
+                src="https://play-lh.googleusercontent.com/VP1NKpzdRoxLJ2gNEl9Hxhbs3rCEZ_TAXC1chzsWV6ikA_yFeDFyqx1sEWraYdZ6IA"
+                alt="Faulu Logo" style="width: 38px; height: 38px; object-fit: contain; flex-shrink: 0;" />
+            <div class="logo-text">
+                <div class="ln">FAULU <em>KENYA</em></div>
+                <span class="ls">H2H Processing Portal</span>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-group-label">Main</div>
+
+            <div class="nav-item active" data-tip="Dashboard" onclick="setActive(this)">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Dashboard</span>
+            </div>
+
+            <div class="nav-group-label">Reports & Enquiries</div>
+
+            <div class="nav-item" id="reportsNav" data-tip="Reports" onclick="toggleSub('reportsSub','reportsNav')">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Reports</span>
+                <span class="nav-badge">4</span>
+                <span class="nav-chevron">▶</span>
+            </div>
+            <div class="sub-menu" id="reportsSub">
+                <div class="sub-item active"><span class="sub-dot"></span>Daily Summary</div>
+                <div class="sub-item"><span class="sub-dot"></span>Monthly Report</div>
+                <div class="sub-item"><span class="sub-dot"></span>Failed Transactions</div>
+                <div class="sub-item"><span class="sub-dot"></span>Callback Logs</div>
+            </div>
+
+            <div class="nav-item" id="enquiriesNav" data-tip="Enquiries"
+                onclick="toggleSub('enquiriesSub','enquiriesNav')">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-label">Enquiries</span>
+                <span class="nav-chevron">▶</span>
+            </div>
+            <div class="sub-menu" id="enquiriesSub">
+                <div class="sub-item"><span class="sub-dot"></span>Transaction Lookup</div>
+                <div class="sub-item"><span class="sub-dot"></span>Account Enquiry</div>
+                <div class="sub-item"><span class="sub-dot"></span>Status Check</div>
+            </div>
+
+            <div class="nav-group-label">Management</div>
+
+            <div class="nav-item" data-tip="Clients" onclick="setActive(this)">
+                <span class="nav-icon">🏢</span>
+                <span class="nav-label">Clients</span>
+            </div>
+
+            <div class="nav-item" data-tip="Callbacks" onclick="setActive(this)">
+                <span class="nav-icon">🔔</span>
+                <span class="nav-label">Callback Notifications</span>
+                <span class="nav-badge">2</span>
+            </div>
+
+            <div class="nav-item" data-tip="API Status" onclick="setActive(this)">
+                <span class="nav-icon">🔌</span>
+                <span class="nav-label">API Status</span>
+            </div>
+
+            <div class="nav-item" data-tip="File Uploads" onclick="setActive(this)">
+                <span class="nav-icon">📂</span>
+                <span class="nav-label">File Uploads</span>
+            </div>
+        </div>
+
+        <div class="sidebar-foot">
+            <div class="nav-group-label">System</div>
+            <div class="nav-item" data-tip="Settings" onclick="setActive(this)">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-label">Settings</span>
+            </div>
+            <div class="nav-item" data-tip="Admin" onclick="setActive(this)">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Admin Profile</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toggle Btn -->
+    <div class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()" title="Collapse/Expand">◀</div>
+
+    <!-- ══ PAGE WRAPPER ══ -->
+    <div class="page-wrapper" id="pageWrapper">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="breadcrumb">
+                H2H &nbsp;/&nbsp; <span>Transcation Dashboard</span>
+                <span
+                    style="font-size: 0.70rem; color: var(--text-muted); font-weight: 700; margin-left: 15px; letter-spacing: 0.5px; opacity: 0.8; padding-left: 15px; border-left: 1px solid var(--border-dark);">BACKED
+                    BY OLD MUTUAL</span>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-meta">
+                    <div class="report-badge" id="reportDate">Report Date: --</div>
+                    <div class="report-badge" id="lastUpdated">Last updated: -- (updates every 10 mins)</div>
+                </div>
+                <button class="notif-btn" title="Notifications">🔔<span class="badge">3</span></button>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content">
+            <div id="mainDashboard">
+                <div class="filter-header dashboard-filters">
+                    <div class="filter-group">
+                        <label class="filter-lbl-styled">Search</label>
+                        <div class="search-box-wrapper">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="txSearch" class="search-input-styled"
+                                placeholder="Search by Ref, Type or amount..." onkeyup="filterActivity()">
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-lbl-styled">Period</label>
+                        <select class="select-styled" id="periodFilter" onchange="filterActivity()">
+                            <option value="all">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="7d">Last 7 Days</option>
+                            <option value="30d">Last 30 Days</option>
+                            <option value="1q">Q1 (Jan–Mar)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-lbl-styled">Type</label>
+                        <select class="select-styled" id="typeFilter" onchange="filterActivity()">
+                            <option value="all">All Types</option>
+                            <option value="EFT">EFT</option>
+                            <option value="RTGS">RTGS</option>
+                            <option value="Mpesa">Mpesa</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-lbl-styled">Status</label>
+                        <select class="select-styled" id="statusFilter" onchange="filterActivity()">
+                            <option value="all">All Statuses</option>
+                            <option value="Success">Success</option>
+                            <option value="Failed">Failed</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Queued">Queued</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" style="justify-content: flex-end; align-items: flex-end;">
+                        <label class="filter-lbl-styled">&nbsp;</label>
+                        <button class="download-btn" id="downloadCsvBtn" onclick="downloadTransactionCSV()"
+                            title="Download filtered transactions as CSV">Download CSV</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div class="section-label" style="margin-bottom: 0;">Performance Metrics</div>
+                    <button class="view-breakdown-btn" onclick="showBreakdownPopup()">
+                        <span>📊</span> View Detailed Breakdown
+                    </button>
+                </div>
+
+                <!-- KPI Row -->
+                <div class="kpi-row">
+                    <div class="kpi-card s" onclick="showKpiDrillDown('Successful')">
+                        <div class="kpi-icon s">✅</div>
+                        <div>
+                            <div class="kpi-lbl">Total Successful</div>
+                            <div class="kpi-val s" id="kpiSuccessful">217</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card d" onclick="showKpiDrillDown('Failed')">
+                        <div class="kpi-icon d">❌</div>
+                        <div>
+                            <div class="kpi-lbl">Total Failed</div>
+                            <div class="kpi-val d" id="kpiFailed">1</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card w" onclick="showKpiDrillDown('Queued')">
+                        <div class="kpi-icon w">⏳</div>
+                        <div>
+                            <div class="kpi-lbl">Queued</div>
+                            <div class="kpi-val w" id="kpiQueued">1</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card i" onclick="showKpiDrillDown('Pending')">
+                        <div class="kpi-icon i">🔄</div>
+                        <div>
+                            <div class="kpi-lbl">Pending Bal. Validation</div>
+                            <div class="kpi-val i" id="kpiPending">1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-row">
+                    <div class="chart-box">
+                        <div class="box-hdr">
+                            <h2 id="mainChartTitle">📈 7-Day Transaction Volume</h2>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div class="chart-controls">
+                                    <button class="ctrl-btn" onclick="updateMainTimeline('today', this)">Today</button>
+                                    <button class="ctrl-btn active" onclick="updateMainTimeline('7d', this)">7D</button>
+                                    <button class="ctrl-btn" onclick="updateMainTimeline('30d', this)">30D</button>
+                                    <button class="ctrl-btn" onclick="updateMainTimeline('1q', this)">1Q</button>
+                                </div>
+                                <div class="separator" style="width:1px; height:20px; background:var(--border)"></div>
+                                <div class="legend">
+                                    <div class="leg">
+                                        <div class="leg-dot" style="background:#16A34A"></div>Success
+                                    </div>
+                                    <div class="leg">
+                                        <div class="leg-dot" style="background:#DC2626"></div>Failed
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <canvas id="trendChart" height="300"></canvas>
+                    </div>
+
+                    <div class="log-container">
+                        <div class="section-label">Transaction Log</div>
+
+                        <div class="log-scroll-area" id="logScrollArea">
+                            <table class="tx-table" id="activityTable">
+                                <thead>
+                                    <tr>
+                                        <th>Ref No.</th>
+                                        <th>Time</th>
+                                        <th>Type</th>
+                                        <th>Amount (KES)</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activityBody">
+                                    <tr
+                                        onclick="showDrillDown('H2H-000217', '10:58:12', 'EFT', '45,000', 'Success', 'NLS-CORP-01')">
+                                        <td>H2H-000217</td>
+                                        <td>10:58:12</td>
+                                        <td>EFT</td>
+                                        <td>45,000</td>
+                                        <td><span class="pill success">Success</span></td>
+                                    </tr>
+                                    <tr
+                                        onclick="showDrillDown('H2H-000216', '10:55:04', 'EFT', '120,500', 'Failed', 'NLS-CORP-02')">
+                                        <td>H2H-000216</td>
+                                        <td>10:55:04</td>
+                                        <td>EFT</td>
+                                        <td>120,500</td>
+                                        <td><span class="pill failed">Failed</span></td>
+                                    </tr>
+                                    <tr
+                                        onclick="showDrillDown('H2H-000215', '10:52:30', 'RTGS', '2,300,000', 'Success', 'NLS-IND-05')">
+                                        <td>H2H-000215</td>
+                                        <td>10:52:30</td>
+                                        <td>RTGS</td>
+                                        <td>2,300,000</td>
+                                        <td><span class="pill success">Success</span></td>
+                                    </tr>
+                                    <tr
+                                        onclick="showDrillDown('H2H-000214', '10:48:15', 'EFT', '8,750', 'Success', 'NLS-CORP-01')">
+                                        <td>H2H-000214</td>
+                                        <td>10:48:15</td>
+                                        <td>EFT</td>
+                                        <td>8,750</td>
+                                        <td><span class="pill success">Success</span></td>
+                                    </tr>
+                                    <tr
+                                        onclick="showDrillDown('H2H-000213', '10:45:00', 'RTGS', '560,000', 'Success', 'NLS-IND-03')">
+                                        <td>H2H-000213</td>
+                                        <td>10:45:00</td>
+                                        <td>RTGS</td>
+                                        <td>560,000</td>
+                                        <td><span class="pill success">Success</span></td>
+                                    </tr>
+                                    <tr
+                                        onclick="showDrillDown('H2H-000212', '10:42:10', 'EFT', '33,200', 'Pending', 'NLS-IND-01')">
+                                        <td>H2H-000212</td>
+                                        <td>10:42:10</td>
+                                        <td>EFT</td>
+                                        <td>33,200</td>
+                                        <td><span class="pill pending">Pending</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- Load More -->
+                            <div style="text-align: center; margin: 1.5rem 0;">
+                                <button class="view-breakdown-btn" style="display: inline-flex; width: auto;"
+                                    id="loadMoreBtn" onclick="loadMoreLogs()">
+                                    <span>📂</span> Load Older Transactions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer>&copy; 2026 &nbsp;<strong>Faulu Kenya Microfinance Bank</strong>&nbsp; | &nbsp;<strong>Backed by Old
+                Mutual</strong>&nbsp; | &nbsp;H2H Transaction
+            Processing
+            System &nbsp;|&nbsp; Powered by NLS Tech Solutions Ltd.</footer>
+    </div>
+
+    <!-- Drill-down Modal -->
+    <div class="modal-overlay" id="drillModal" onclick="if(event.target === this) closeDrillDown()">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Transaction Insights — <span id="modalTitle">REF-000</span></h3>
+                <button class="close-modal" onclick="closeDrillDown()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="txDetails">
+                    <div class="detail-row-premium">
+                        <div class="detail-group-premium">
+                            <span class="detail-lbl-premium">Transaction Amount</span>
+                            <div class="detail-val-premium" id="detAmt" style="font-size: 1.4rem; color: var(--blue);">
+                                KES 0</div>
+                        </div>
+                        <div class="detail-group-premium">
+                            <span class="detail-lbl-premium">Current Status</span>
+                            <div id="detStatusWrapper">
+                                <span class="status-badge-large" id="detStatusPill">SUCCESS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 0.6rem;">
+                        <div class="insight-card">
+                            <span class="insight-label">Channel/Type</span>
+                            <span class="insight-num" id="detType" style="font-size: 1.1rem;">-</span>
+                        </div>
+                        <div class="insight-card">
+                            <span class="insight-label">Client ID</span>
+                            <span class="insight-num" id="detClient" style="font-size: 1.1rem;">-</span>
+                        </div>
+                        <div class="insight-card">
+                            <span class="insight-label">Monthly Volume</span>
+                            <span class="insight-num" id="detMonthlyCount" style="font-size: 1.1rem;">0</span>
+                        </div>
+                    </div>
+
+                    <div class="insights-section">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                            <h4 id="drillChartTitle"
+                                style="color: var(--navy); font-size: 0.9rem; font-weight: 800; text-transform: uppercase;">
+                                7-Day Performance Trend</h4>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div class="chart-controls">
+                                    <button class="ctrl-btn" onclick="updateDrillTimeline('today', this)">Today</button>
+                                    <button class="ctrl-btn active"
+                                        onclick="updateDrillTimeline('7d', this)">7D</button>
+                                    <button class="ctrl-btn" onclick="updateDrillTimeline('30d', this)">30D</button>
+                                    <button class="ctrl-btn" onclick="updateDrillTimeline('1q', this)">1Q</button>
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--success); font-weight: 700;">
+                                    Health: <span id="detHealth">99.8%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <canvas id="drillTrendChart" height="80"></canvas>
+                    </div>
+                </div>
+
+                <div id="kpiDetails" style="display: none;">
+                    <div class="mini-kpi-row" style="margin-bottom: 1rem;">
+                        <div class="mini-kpi">
+                            <span class="mini-lbl">Status</span>
+                            <span class="mini-val" id="kpiStatusTitle" style="color: var(--navy)">-</span>
+                        </div>
+                        <div class="mini-kpi">
+                            <span class="mini-lbl">Total Count</span>
+                            <span class="mini-val" id="kpiTotalCount">0</span>
+                        </div>
+                    </div>
+
+                    <!-- 50/50 Split Grid -->
+                    <div class="kpi-split-grid">
+                        <!-- Left: Graph View -->
+                        <div class="kpi-chart-section"
+                            style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                                <h4 id="kpiChartTitle" style="color: var(--navy); font-size: 0.85rem;">📈 7-Day Trend
+                                </h4>
+                                <div class="chart-controls">
+                                    <button class="ctrl-btn" onclick="updateKpiTimeline('today', this)">Today</button>
+                                    <button class="ctrl-btn active" onclick="updateKpiTimeline('7d', this)">7D</button>
+                                    <button class="ctrl-btn" onclick="updateKpiTimeline('30d', this)">30D</button>
+                                    <button class="ctrl-btn" onclick="updateKpiTimeline('1q', this)">1Q</button>
+                                </div>
+                            </div>
+                            <canvas id="kpiTrendChart" height="150"></canvas>
+                        </div>
+
+                        <!-- Right: Transactions View -->
+                        <div class="kpi-tx-section" style="display: flex; flex-direction: column;">
+                            <h4 style="margin-bottom: 1rem; color: var(--navy); font-size: 0.85rem;">📄 Recent
+                                Transactions</h4>
+                            <div class="log-scroll-area" style="max-height: 220px; border-radius: 12px; margin-top: 0;">
+                                <table class="tx-table" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Ref No.</th>
+                                            <th>Type</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="kpiTxBody">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="breakdownCards" style="display: none;">
+                    <div class="cards-grid" style="grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        <!-- Total -->
+                        <div class="tx-card total">
+                            <div class="tx-hdr">
+                                <span class="tx-hdr-title">Total Transactions Today</span>
+                                <span class="tx-hdr-icon">📊</span>
+                            </div>
+                            <div class="tx-body">
+                                <div class="tx-row"><span class="tx-label">Success</span><span
+                                        class="tx-val s">217</span></div>
+                                <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">1</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val q">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Pending Bal.
+                                        Validation</span><span class="tx-val p">0</span></div>
+                            </div>
+                        </div>
+                        <!-- RTGS -->
+                        <div class="tx-card rtgs">
+                            <div class="tx-hdr">
+                                <span class="tx-hdr-title">RTGS Transactions</span>
+                                <span class="tx-hdr-icon">🏦</span>
+                            </div>
+                            <div class="tx-body">
+                                <div class="tx-row"><span class="tx-label">Success</span><span
+                                        class="tx-val s">12</span></div>
+                                <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val q">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Pending Bal.
+                                        Validation</span><span class="tx-val p">0</span></div>
+                            </div>
+                        </div>
+                        <!-- EFT -->
+                        <div class="tx-card eft">
+                            <div class="tx-hdr">
+                                <span class="tx-hdr-title">EFT Transactions</span>
+                                <span class="tx-hdr-icon">💳</span>
+                            </div>
+                            <div class="tx-body">
+                                <div class="tx-row"><span class="tx-label">Success</span><span
+                                        class="tx-val s">205</span></div>
+                                <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">1</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val q">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Pending Bal.
+                                        Validation</span><span class="tx-val p">0</span></div>
+                            </div>
+                        </div>
+                        <!-- Internal -->
+                        <div class="tx-card int">
+                            <div class="tx-hdr">
+                                <span class="tx-hdr-title">Internal Transfers</span>
+                                <span class="tx-hdr-icon">🔁</span>
+                            </div>
+                            <div class="tx-body">
+                                <div class="tx-row"><span class="tx-label">Success</span><span class="tx-val s">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val q">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Pending Bal.
+                                        Validation</span><span class="tx-val p">0</span></div>
+                            </div>
+                        </div>
+                        <!-- Mpesa -->
+                        <div class="tx-card mpesa">
+                            <div class="tx-hdr">
+                                <span class="tx-hdr-title">Mpesa Transactions</span>
+                                <span class="tx-hdr-icon">📱</span>
+                            </div>
+                            <div class="tx-body">
+                                <div class="tx-row"><span class="tx-label">Success</span><span class="tx-val s">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val q">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Pending Bal.
+                                        Validation</span><span class="tx-val p">0</span></div>
+                            </div>
+                        </div>
+                        <!-- Pesalink -->
+                        <div class="tx-card pesa">
+                            <div class="tx-hdr">
+                                <span class="tx-hdr-title">Pesalink Transactions</span>
+                                <span class="tx-hdr-icon">🔗</span>
+                            </div>
+                            <div class="tx-body">
+                                <div class="tx-row"><span class="tx-label">Success</span><span class="tx-val s">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val q">0</span>
+                                </div>
+                                <div class="tx-row"><span class="tx-label">Pending Bal.
+                                        Validation</span><span class="tx-val p">0</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size: 0.65rem; color: var(--text-muted); margin-top: 15px; font-style: italic;">
+                * This trend is specific to the selected transaction type and client channel.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Clock & Refresh Logic
+        function updateClock() {
+            // Intentionally left minimal after removing redundant header date/dashboard section
+        }
+
+        function updateReportMeta() {
+            const now = new Date();
+            const reportDateEl = document.getElementById('reportDate');
+            const lastUpdatedEl = document.getElementById('lastUpdated');
+
+            if (reportDateEl) {
+                reportDateEl.textContent = `Report Date: ${now.toLocaleDateString('en-KE', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit'
+                })}`;
+            }
+
+            if (lastUpdatedEl) {
+                lastUpdatedEl.textContent = `Last updated: ${now.toLocaleString('en-KE', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })} (refreshes every 10 mins)`;
+            }
+        }
+
+        // Simulated Refresh every 10 minutes
+        function refreshData() {
+            const now = new Date();
+
+            // Re-randomize KPI values for visual feedback
+            document.querySelectorAll('.kpi-val').forEach(val => {
+                const current = parseInt(val.textContent.replace(/,/g, ''));
+                if (!isNaN(current)) {
+                    const delta = Math.floor(Math.random() * 20) - 5;
+                    val.textContent = (current + delta).toLocaleString();
+                }
+            });
+            updateReportMeta();
+            console.log('Dashboard refreshed at ' + now.toLocaleTimeString());
+        }
+
+        // Initial set and 10-minute interval
+        setInterval(refreshData, 600000); // 10 minutes
+
+        // Sidebar
+        function toggleSidebar() {
+            const s = document.getElementById('sidebar');
+            const b = document.getElementById('toggleBtn');
+            const w = document.getElementById('pageWrapper');
+            s.classList.toggle('collapsed');
+            if (s.classList.contains('collapsed')) {
+                b.textContent = '▶'; b.style.left = '49px'; w.style.marginLeft = '62px';
+            } else {
+                b.textContent = '◀'; b.style.left = 'calc(256px - 13px)'; w.style.marginLeft = '256px';
+            }
+        }
+
+        function setActive(el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function toggleSub(subId, navId) {
+            const sub = document.getElementById(subId);
+            const nav = document.getElementById(navId);
+            const isOpen = sub.classList.contains('open');
+            document.querySelectorAll('.sub-menu').forEach(s => s.classList.remove('open'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('open'));
+            if (!isOpen) { sub.classList.add('open'); nav.classList.add('open'); }
+            setActive(nav);
+        }
+
+        function showBreakdownPopup() {
+            document.getElementById('modalTitle').textContent = 'Transaction Types Breakdown';
+            document.getElementById('txDetails').style.display = 'none';
+            document.getElementById('kpiDetails').style.display = 'none';
+            document.getElementById('breakdownCards').style.display = 'block';
+
+            document.getElementById('drillModal').classList.add('active');
+        }
+
+        function switchTab(event, tabId) {
+            // Logic removed for single screen consolidation
+        }
+
+        // Filtering
+        // Assign simulated dates to rows (used for period filtering)
+        const ROW_DATE_ATTR = 'data-tx-date';
+        function assignRowDates() {
+            const rows = document.querySelectorAll('#activityTable tbody tr');
+            const today = new Date();
+            rows.forEach((row, i) => {
+                if (!row.getAttribute(ROW_DATE_ATTR)) {
+                    const d = new Date(today);
+                    // Spread rows across past ~90 days
+                    d.setDate(d.getDate() - Math.floor(i * 3));
+                    row.setAttribute(ROW_DATE_ATTR, d.toISOString().slice(0, 10));
+                }
+            });
+        }
+
+        function filterActivity() {
+            assignRowDates();
+            const search = document.getElementById('txSearch').value.toLowerCase();
+            const type = document.getElementById('typeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const period = document.getElementById('periodFilter')?.value || 'all';
+            const rows = document.querySelectorAll('#activityTable tbody tr');
+            const today = new Date();
+            const todayStr = today.toISOString().slice(0, 10);
+            const counts = { Success: 0, Failed: 0, Queued: 0, Pending: 0 };
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const rowType = row.cells[2].textContent;
+                const rowStatus = row.cells[4].textContent.trim();
+                const rowDate = row.getAttribute(ROW_DATE_ATTR) || '';
+
+                const matchesSearch = text.includes(search);
+                const matchesType = type === 'all' || rowType === type;
+                const matchesStatus = status === 'all' || rowStatus === status;
+
+                let matchesPeriod = true;
+                if (period === 'today') {
+                    matchesPeriod = rowDate === todayStr;
+                } else if (period === '7d') {
+                    const cutoff = new Date(today); cutoff.setDate(cutoff.getDate() - 7);
+                    matchesPeriod = new Date(rowDate) >= cutoff;
+                } else if (period === '30d') {
+                    const cutoff = new Date(today); cutoff.setDate(cutoff.getDate() - 30);
+                    matchesPeriod = new Date(rowDate) >= cutoff;
+                } else if (period === '1q') {
+                    const year = today.getFullYear();
+                    const q1Start = new Date(year, 0, 1); // Jan 1
+                    const q1End = new Date(year, 2, 31); // Mar 31
+                    const d = new Date(rowDate);
+                    matchesPeriod = d >= q1Start && d <= q1End;
+                }
+
+                const visible = matchesSearch && matchesType && matchesStatus && matchesPeriod;
+                row.style.display = visible ? '' : 'none';
+
+                if (visible) {
+                    if (rowStatus === 'Success') counts.Success++;
+                    else if (rowStatus === 'Failed') counts.Failed++;
+                    else if (rowStatus === 'Queued') counts.Queued++;
+                    else if (rowStatus === 'Pending') counts.Pending++;
+                }
+            });
+
+            // Update KPI cards (global dashboard effect)
+            const kpiSuccessful = document.getElementById('kpiSuccessful');
+            const kpiFailed = document.getElementById('kpiFailed');
+            const kpiQueued = document.getElementById('kpiQueued');
+            const kpiPending = document.getElementById('kpiPending');
+            if (kpiSuccessful) kpiSuccessful.textContent = counts.Success;
+            if (kpiFailed) kpiFailed.textContent = counts.Failed;
+            if (kpiQueued) kpiQueued.textContent = counts.Queued;
+            if (kpiPending) kpiPending.textContent = counts.Pending;
+
+            // Keep main chart period synced with top global filter period
+            if (period === 'today' || period === '7d' || period === '30d' || period === '1q') {
+                updateMainTimeline(period);
+            }
+
+            // Update badge on download button with count
+            const visible = [...rows].filter(r => r.style.display !== 'none').length;
+            const btn = document.getElementById('downloadCsvBtn');
+            if (btn) btn.title = `Download ${visible} transaction(s) as CSV`;
+        }
+
+        function downloadTransactionCSV() {
+            assignRowDates();
+            const rows = [...document.querySelectorAll('#activityTable tbody tr')]
+                .filter(r => r.style.display !== 'none');
+
+            if (rows.length === 0) {
+                alert('No transactions match the current filters.');
+                return;
+            }
+
+            const periodEl = document.getElementById('periodFilter');
+            const periodLabel = periodEl ? periodEl.options[periodEl.selectedIndex].text : 'All Time';
+
+            let csv = 'Faulu Kenya H2H Portal — Transaction Report\n';
+            csv += `Period: ${periodLabel}\n`;
+            csv += `Generated: ${new Date().toLocaleString('en-KE')}\n\n`;
+            csv += 'Ref No.,Date,Time,Type,Amount (KES),Status\n';
+
+            rows.forEach(row => {
+                const cells = row.cells;
+                const ref = cells[0].textContent.trim();
+                const time = cells[1].textContent.trim();
+                const type = cells[2].textContent.trim();
+                const amount = cells[3].textContent.trim();
+                const status = cells[4].textContent.trim();
+                const date = row.getAttribute(ROW_DATE_ATTR) || '';
+                csv += `"${ref}","${date}","${time}","${type}","${amount}","${status}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const safeDate = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `FauluKenyaH2H_Transactions_${periodLabel.replace(/\s/g, '_')}_${safeDate}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Drill-down Modal
+        let drillChart = null;
+
+        let logPage = 0;
+        function loadMoreLogs() {
+            const btn = document.getElementById('loadMoreBtn');
+            btn.innerHTML = '<span>⏳</span> Loading...';
+            btn.style.opacity = '0.7';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                const tbody = document.querySelector('#activityTable tbody');
+                const startIdx = 210 - (logPage * 5);
+
+                for (let i = 0; i < 5; i++) {
+                    const ref = 'H2H-' + String(startIdx - i).padStart(6, '0');
+                    const types = ['EFT', 'RTGS', 'Mpesa'];
+                    const status = ['Success', 'Success', 'Failed', 'Pending'];
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    const s = status[Math.floor(Math.random() * status.length)];
+                    const amt = (Math.floor(Math.random() * 500000) + 1000).toLocaleString();
+
+                    // Realistic older timestamp
+                    const now = new Date();
+                    now.setMinutes(now.getMinutes() - (logPage * 10) - (i * 2));
+                    const timeStr = now.toLocaleTimeString('en-GB');
+
+                    const row = document.createElement('tr');
+                    row.onclick = () => showDrillDown(ref, timeStr, type, amt, s, 'NLS-CHANNEL-' + Math.floor(Math.random() * 10));
+
+                    let pillClass = 'queued';
+                    if (s === 'Success') pillClass = 'success';
+                    if (s === 'Failed') pillClass = 'failed';
+                    if (s === 'Pending') pillClass = 'pending';
+
+                    row.innerHTML = `
+                        <td>${ref}</td>
+                        <td>${timeStr}</td>
+                        <td>${type}</td>
+                        <td>${amt}</td>
+                        <td><span class="pill ${pillClass}">${s}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                }
+
+                logPage++;
+                btn.innerHTML = '<span>📂</span> Load Older Transactions';
+                btn.style.opacity = '1';
+                btn.disabled = false;
+
+                // Refresh filters if search is active
+                filterActivity();
+            }, 800);
+        }
+
+        function closeDrillDown() {
+            document.getElementById('drillModal').classList.remove('active');
+        }
+
+        let kpiChartInstance = null;
+        function showKpiDrillDown(type) {
+            currentKpiType = type; // track for time filter re-renders
+            document.getElementById('modalTitle').textContent = type + ' Transactions Dashboard';
+            document.getElementById('kpiStatusTitle').textContent = type;
+            document.getElementById('txDetails').style.display = 'none';
+            document.getElementById('kpiDetails').style.display = 'block';
+            document.getElementById('breakdownCards').style.display = 'none';
+
+            // Mock Data Generation
+            const isSuccess = type === 'Successful';
+            const baseCount = isSuccess ? 217 : (type === 'Failed' ? 12 : 5);
+            document.getElementById('kpiTotalCount').textContent = baseCount.toLocaleString();
+
+            // Populate Right Side: Recent Transactions
+            const tbody = document.getElementById('kpiTxBody');
+            tbody.innerHTML = '';
+
+            const txCount = Math.min(baseCount, 15); // Show up to 15 rows
+            const types = ['EFT', 'RTGS', 'Mpesa'];
+
+            for (let i = 0; i < txCount; i++) {
+                const rType = types[Math.floor(Math.random() * types.length)];
+                const amt = (Math.random() * 50000 + 1000).toLocaleString('en-US', { maximumFractionDigits: 0 });
+                const ref = 'H2H-' + Math.floor(100000 + Math.random() * 900000);
+
+                tbody.innerHTML += `
+                            <tr style="cursor: pointer;" onclick="showDrillDown('${ref}', '10:00:00', '${rType}', '${amt}', '${type}', 'NLS-CORP')">
+                                <td style="color: var(--blue-light); font-weight: 600;">${ref}</td>
+                                <td>${rType}</td>
+                                <td style="font-weight: 700;">KES ${amt}</td>
+                            </tr>
+                        `;
+            }
+
+            // Populate Left Side: Trend Chart
+            renderKpiChart('7d');
+            // Reset time controls to 7D active
+            document.querySelectorAll('#kpiDetails .chart-controls .ctrl-btn').forEach(b => b.classList.remove('active'));
+            const defaultKpiBtn = document.querySelector('#kpiDetails .chart-controls .ctrl-btn:nth-child(2)');
+            if (defaultKpiBtn) defaultKpiBtn.classList.add('active');
+
+            document.getElementById('drillModal').classList.add('active');
+        }
+
+        let currentKpiType = 'Successful';
+        function updateKpiTimeline(timeline, btn) {
+            if (btn) {
+                btn.parentElement.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            renderKpiChart(timeline);
+        }
+
+        function renderKpiChart(timeline) {
+            const ctx = document.getElementById('kpiTrendChart').getContext('2d');
+            if (kpiChartInstance) kpiChartInstance.destroy();
+            const isSuccess = currentKpiType === 'Successful';
+
+            const titleEl = document.getElementById('kpiChartTitle');
+            let labels, graphData;
+
+            if (timeline === 'today') {
+                titleEl.textContent = '📈 Today (Hourly)';
+                labels = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
+                graphData = isSuccess ? [12, 25, 42, 38, 45, 30, 15] : [0, 1, 0, 2, 0, 1, 0];
+            } else if (timeline === '7d') {
+                titleEl.textContent = '📈 7-Day Trend';
+                labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                graphData = isSuccess ? [45, 52, 48, 60, 55, 62, 58] : [5, 2, 8, 3, 1, 4, 3];
+            } else if (timeline === '30d') {
+                titleEl.textContent = '📈 30-Day Trend';
+                labels = ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'];
+                graphData = isSuccess ? [210, 245, 198, 260] : [15, 10, 12, 8];
+            } else {
+                titleEl.textContent = '📈 Q1 Performance';
+                labels = ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8', 'Wk 9', 'Wk 10', 'Wk 11', 'Wk 12'];
+                graphData = isSuccess
+                    ? [1200, 1350, 1100, 1450, 1500, 1400, 1600, 1750, 1550, 1800, 1700, 1900]
+                    : [15, 10, 12, 8, 14, 11, 9, 13, 10, 15, 12, 16];
+            }
+
+            const graphColor = isSuccess ? '#16A34A' : (currentKpiType === 'Failed' ? '#DC2626' : '#D97706');
+            const graphBg = isSuccess ? 'rgba(22,163,74,0.1)' : (currentKpiType === 'Failed' ? 'rgba(220,38,38,0.1)' : 'rgba(217,119,6,0.1)');
+
+            kpiChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Volume',
+                        data: graphData,
+                        borderColor: graphColor,
+                        backgroundColor: graphBg,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: graphColor,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#4F2684',
+                            titleFont: { family: 'Outfit' },
+                            bodyFont: { family: 'Inter' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(15,23,42,0.05)', borderDash: [4, 4] },
+                            border: { display: false },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showDrillDown(ref, timeStr, type, amt, status, client) {
+            document.getElementById('modalTitle').textContent = ref;
+            document.getElementById('txDetails').style.display = 'block';
+            document.getElementById('kpiDetails').style.display = 'none';
+            document.getElementById('breakdownCards').style.display = 'none';
+
+            document.getElementById('detAmt').textContent = 'KES ' + amt;
+            document.getElementById('detType').textContent = type;
+            document.getElementById('detClient').textContent = client;
+            document.getElementById('detMonthlyCount').textContent = (Math.floor(Math.random() * 500) + 100).toLocaleString();
+
+            const pill = document.getElementById('detStatusPill');
+            pill.textContent = status.toUpperCase();
+            pill.className = 'status-badge-large ' + status.toLowerCase();
+
+            document.getElementById('drillModal').classList.add('active');
+            renderDrillChart(type);
+        }
+
+        let currentDrillType = 'EFT';
+        function updateDrillTimeline(timeline, btn) {
+            if (btn) {
+                btn.parentElement.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            renderDrillChart(currentDrillType, timeline);
+        }
+
+        function renderDrillChart(type, timeline = '7d') {
+            currentDrillType = type;
+            const ctx = document.getElementById('drillTrendChart').getContext('2d');
+            if (drillChart) drillChart.destroy();
+
+            const title = document.getElementById('drillChartTitle');
+            let labels = [];
+            let data = [];
+
+            if (timeline === 'today') {
+                title.textContent = 'Today\'s Performance (Hourly)';
+                labels = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
+                data = type === 'EFT' ? [5, 12, 18, 25, 22, 15, 8, 4] : [1, 3, 5, 4, 3, 2, 1, 0];
+            } else if (timeline === '7d') {
+                title.textContent = '7-Day Performance Trend';
+                labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                data = type === 'EFT' ? [45, 52, 48, 60, 55, 62, 58] : [10, 8, 12, 11, 9, 13, 12];
+            } else if (timeline === '30d') {
+                title.textContent = '30-Day Performance Trend';
+                labels = ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'];
+                data = type === 'EFT' ? [210, 245, 198, 260] : [45, 38, 52, 48];
+            } else {
+                title.textContent = '1-Quarter Performance Trend';
+                labels = ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8', 'Wk 9', 'Wk 10', 'Wk 11', 'Wk 12'];
+                data = type === 'EFT' ? [210, 245, 198, 260, 280, 250, 290, 310, 270, 320, 305, 340] : [45, 38, 52, 48, 55, 60, 58, 65, 62, 70, 68, 75];
+            }
+
+            drillChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Volume',
+                        data: data,
+                        borderColor: '#4F2684',
+                        backgroundColor: 'rgba(79, 38, 132, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#4F2684'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#4F2684',
+                            titleFont: { family: 'Outfit' },
+                            bodyFont: { family: 'Inter' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(15,23,42,0.05)', borderDash: [4, 4] },
+                            border: { display: false },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: { font: { family: 'Inter', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Dashboard Chart logic
+        let mainChart = null;
+        function updateMainTimeline(timeline, btn) {
+            if (btn) {
+                btn.parentElement.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if (mainChart) mainChart.destroy();
+
+            const title = document.getElementById('mainChartTitle');
+            let labels = [];
+            let successData = [];
+            let failedData = [];
+
+            if (timeline === 'today') {
+                title.textContent = '📈 Today\'s Transaction Volume';
+                labels = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
+                successData = [12, 25, 42, 38, 45, 30, 15];
+                failedData = [0, 1, 0, 2, 0, 1, 0];
+            } else if (timeline === '7d') {
+                title.textContent = '📈 7-Day Transaction Volume';
+                labels = ['24 Feb', '25 Feb', '26 Feb', '27 Feb', '28 Feb', '01 Mar', '02 Mar'];
+                successData = [198, 210, 217, 203, 225, 190, 217];
+                failedData = [3, 1, 2, 0, 1, 2, 1];
+            } else if (timeline === '30d') {
+                title.textContent = '📈 30-Day Transaction Volume';
+                labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                successData = [1200, 1350, 1100, 1450];
+                failedData = [15, 10, 12, 8];
+            } else {
+                title.textContent = '📈 1-Quarter Transaction Volume';
+                labels = ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8', 'Wk 9', 'Wk 10', 'Wk 11', 'Wk 12'];
+                successData = [1200, 1350, 1100, 1450, 1500, 1400, 1600, 1750, 1550, 1800, 1700, 1900];
+                failedData = [15, 10, 12, 8, 14, 11, 9, 13, 10, 15, 12, 16];
+            }
+
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Success',
+                            data: successData,
+                            borderColor: '#4F2684',
+                            backgroundColor: 'rgba(79, 38, 132, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#4F2684'
+                        },
+                        {
+                            label: 'Failed',
+                            data: failedData,
+                            borderColor: '#F37021',
+                            backgroundColor: 'rgba(243, 112, 33, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#4F2684',
+                            borderColor: 'rgba(243,112,33,0.5)',
+                            borderWidth: 1,
+                            titleColor: '#fff',
+                            bodyColor: '#FBC39C',
+                            padding: 12,
+                            titleFont: { family: 'Outfit', size: 13 },
+                            bodyFont: { family: 'Inter', size: 12 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748B', font: { size: 11, family: 'Inter' } },
+                            border: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(15,23,42,0.06)', borderDash: [5, 5] },
+                            ticks: {
+                                color: '#64748B',
+                                font: { size: 11, family: 'Inter' },
+                                maxTicksLimit: 6
+                            },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initial load
+        updateMainTimeline('7d');
+        filterActivity();
+        updateReportMeta();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>H2H Dashboard — NLS Tech Solutions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      /* NLS Brand Colors */
+      --navy: #13121F;
+      --navy-mid: #1B2A6B;
+      --blue: #2869E5;
+      --blue-light: #55ACEE;
+      --blue-pale: #EBF2FF;
+      --gold: #B08D57;
+      --gold-light: #D4AF72;
+      --red-accent: #C0392B;
+
+      /* UI */
+      --bg: #F0F4FA;
+      --surface: #FFFFFF;
+      --card: #FFFFFF;
+      --border: #D6E2F5;
+      --border-strong: #B8CEEE;
+      --text: #13121F;
+      --text-mid: #334270;
+      --text-muted: #6B7DAE;
+      --success: #16A34A;
+      --danger: #DC2626;
+      --warning: #D97706;
+      --info: #2869E5;
+
+      --shadow-sm: 0 1px 4px rgba(19, 18, 31, 0.08);
+      --shadow-md: 0 4px 16px rgba(19, 18, 31, 0.1);
+      --shadow-lg: 0 8px 32px rgba(19, 18, 31, 0.12);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 68px;
+      background: var(--navy);
+      border-bottom: 3px solid var(--blue);
+      box-shadow: var(--shadow-md);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* NLS Globe icon (CSS-drawn) */
+    .nls-globe {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--blue-light), var(--blue));
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 0 12px rgba(40, 105, 229, 0.5);
+      flex-shrink: 0;
+    }
+
+    .brand-text .name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+      line-height: 1;
+    }
+
+    .brand-text .name em {
+      color: var(--gold);
+      font-style: normal;
+    }
+
+    .brand-text .sub {
+      font-size: 0.65rem;
+      color: var(--gold-light);
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 2px;
+      display: block;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.15);
+      margin: 0 6px;
+    }
+
+    .module-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--blue-light);
+      letter-spacing: 0.5px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .live-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(22, 163, 74, 0.15);
+      border: 1px solid rgba(22, 163, 74, 0.4);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #4ade80;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: .5;
+        transform: scale(1.4)
+      }
+    }
+
+    .header-clock {
+      text-align: right;
+    }
+
+    .header-clock .time {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+
+    .header-clock .date {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 1px;
+    }
+
+    /* ─── MAIN ─── */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Page title */
+    .page-title {
+      margin-bottom: 1.8rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .page-title h1 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .page-title h1 span {
+      color: var(--blue);
+    }
+
+    .page-title .sub {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .report-badge {
+      background: var(--blue-pale);
+      border: 1px solid var(--border-strong);
+      color: var(--navy-mid);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+
+    /* ─── KPI ROW ─── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      border-radius: 14px 0 0 14px;
+    }
+
+    .kpi-card.s::after {
+      background: var(--success);
+    }
+
+    .kpi-card.d::after {
+      background: var(--danger);
+    }
+
+    .kpi-card.w::after {
+      background: var(--warning);
+    }
+
+    .kpi-card.i::after {
+      background: var(--info);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .kpi-icon.s {
+      background: #DCFCE7;
+    }
+
+    .kpi-icon.d {
+      background: #FEE2E2;
+    }
+
+    .kpi-icon.w {
+      background: #FEF3C7;
+    }
+
+    .kpi-icon.i {
+      background: var(--blue-pale);
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-top: 2px;
+    }
+
+    .kpi-value.s {
+      color: var(--success);
+    }
+
+    .kpi-value.d {
+      color: var(--danger);
+    }
+
+    .kpi-value.w {
+      color: var(--warning);
+    }
+
+    .kpi-value.i {
+      color: var(--info);
+    }
+
+    /* ─── SECTION LABEL ─── */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── TRANSACTION CARDS ─── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .tx-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .tx-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .tx-card.total {
+      border-top: 3px solid var(--gold);
+    }
+
+    .tx-card.rtgs {
+      border-top: 3px solid var(--blue);
+    }
+
+    .tx-card.eft {
+      border-top: 3px solid var(--navy-mid);
+    }
+
+    .tx-card.int {
+      border-top: 3px solid var(--blue-light);
+    }
+
+    .tx-card.mpesa {
+      border-top: 3px solid #16A34A;
+    }
+
+    .tx-card.pesa {
+      border-top: 3px solid var(--red-accent);
+    }
+
+    .tx-hdr {
+      background: linear-gradient(90deg, var(--navy) 0%, var(--navy-mid) 100%);
+      padding: 0.85rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .tx-card.total .tx-hdr {
+      background: linear-gradient(90deg, #2A1F00, #5A3E07);
+    }
+
+    .tx-card.mpesa .tx-hdr {
+      background: linear-gradient(90deg, #064E3B, #065F46);
+    }
+
+    .tx-card.pesa .tx-hdr {
+      background: linear-gradient(90deg, #7F1D1D, #991B1B);
+    }
+
+    .tx-hdr-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .tx-hdr-icon {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .tx-body {
+      padding: 0.9rem 1.2rem;
+    }
+
+    .tx-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid #F1F5FB;
+      font-size: 0.85rem;
+    }
+
+    .tx-row:last-child {
+      border-bottom: none;
+    }
+
+    .tx-label {
+      color: var(--text-muted);
+    }
+
+    .tx-val {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .tx-val.s {
+      color: var(--success);
+    }
+
+    .tx-val.d {
+      color: var(--danger);
+    }
+
+    .tx-val.m {
+      color: #9BAAC8;
+    }
+
+    /* ─── CHART ─── */
+    .chart-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+    }
+
+    .chart-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .chart-hdr h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .legend {
+      display: flex;
+      gap: 1.2rem;
+    }
+
+    .leg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .leg-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--navy);
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.76rem;
+      border-top: 3px solid var(--blue);
+    }
+
+    footer strong {
+      color: var(--gold-light);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width:1024px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+
+    @media(max-width:640px) {
+      .cards-grid {
+        grid-template-columns: 1fr
+      }
+
+      .kpi-row {
+        grid-template-columns: 1fr
+      }
+
+      main {
+        padding: 1rem
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-brand">
+      <div class="nls-globe">🌐</div>
+      <div class="brand-text">
+        <div class="name">NLS TECH <em>SOLUTIONS LTD</em></div>
+        <span class="sub">Host to Host Processing System</span>
+      </div>
+      <div class="header-divider"></div>
+      <div class="module-label">H2H Dashboard</div>
+    </div>
+    <div class="header-right">
+      <div class="live-pill">
+        <div class="live-dot"></div> Live
+      </div>
+      <div class="header-clock">
+        <div class="time" id="clock">--:--:--</div>
+        <div class="date" id="dateTxt">--</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+    <div class="page-title">
+      <div>
+        <h1><span>H2H</span> Transactions Dashboard</h1>
+        <div class="sub" id="reportDate">Report Date: --</div>
+      </div>
+      <div class="report-badge" id="reportBadge">Monday, 2 March 2026</div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+      <div class="kpi-card s">
+        <div class="kpi-icon s">✅</div>
+        <div>
+          <div class="kpi-label">Total Successful</div>
+          <div class="kpi-value s">217</div>
+        </div>
+      </div>
+      <div class="kpi-card d">
+        <div class="kpi-icon d">❌</div>
+        <div>
+          <div class="kpi-label">Total Failed</div>
+          <div class="kpi-value d">1</div>
+        </div>
+      </div>
+      <div class="kpi-card w">
+        <div class="kpi-icon w">⏳</div>
+        <div>
+          <div class="kpi-label">Queued</div>
+          <div class="kpi-value w">0</div>
+        </div>
+      </div>
+      <div class="kpi-card i">
+        <div class="kpi-icon i">🔄</div>
+        <div>
+          <div class="kpi-label">Pending Bal. Validation</div>
+          <div class="kpi-value i">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction Cards -->
+    <div class="section-label">Transaction Types</div>
+    <div class="cards-grid">
+
+      <div class="tx-card total">
+        <div class="tx-hdr"><span class="tx-hdr-title">Total Transactions Today</span><span
+            class="tx-hdr-icon">📊</span></div>
+        <div class="tx-body">
+          <div class="tx-row"><span class="tx-label">Success</span><span class="tx-val s">217</span></div>
+          <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">1</span></div>
+          <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val m">0</span></div>
+          <div class="tx-row"><span class="tx-label">Pending Bal. Validation</span><span class="tx-val m">0</span></div>
+        </div>
+      </div>
+
+      <div class="tx-card rtgs">
+        <div class="tx-hdr"><span class="tx-hdr-title">RTGS Transactions</span><span class="tx-hdr-icon">🏦</span></div>
+        <div class="tx-body">
+          <div class="tx-row"><span class="tx-label">Success</span><span class="tx-val s">12</span></div>
+          <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">0</span></div>
+          <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val m">0</span></div>
+          <div class="tx-row"><span class="tx-label">Pending Bal. Validation</span><span class="tx-val m">0</span></div>
+        </div>
+      </div>
+
+      <div class="tx-card eft">
+        <div class="tx-hdr"><span class="tx-hdr-title">EFT Transactions</span><span class="tx-hdr-icon">💳</span></div>
+        <div class="tx-body">
+          <div class="tx-row"><span class="tx-label">Success</span><span class="tx-val s">205</span></div>
+          <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">1</span></div>
+          <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val m">0</span></div>
+          <div class="tx-row"><span class="tx-label">Pending Bal. Validation</span><span class="tx-val m">0</span></div>
+        </div>
+      </div>
+
+      <div class="tx-card int">
+        <div class="tx-hdr"><span class="tx-hdr-title">Internal Transfers</span><span class="tx-hdr-icon">🔁</span>
+        </div>
+        <div class="tx-body">
+          <div class="tx-row"><span class="tx-label">Success</span><span class="tx-val s">0</span></div>
+          <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">0</span></div>
+          <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val m">0</span></div>
+          <div class="tx-row"><span class="tx-label">Pending Bal. Validation</span><span class="tx-val m">0</span></div>
+        </div>
+      </div>
+
+      <div class="tx-card mpesa">
+        <div class="tx-hdr"><span class="tx-hdr-title">Mpesa Transactions</span><span class="tx-hdr-icon">📱</span>
+        </div>
+        <div class="tx-body">
+          <div class="tx-row"><span class="tx-label">Success</span><span class="tx-val s">0</span></div>
+          <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">0</span></div>
+          <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val m">0</span></div>
+          <div class="tx-row"><span class="tx-label">Pending Bal. Validation</span><span class="tx-val m">0</span></div>
+        </div>
+      </div>
+
+      <div class="tx-card pesa">
+        <div class="tx-hdr"><span class="tx-hdr-title">Pesalink Transactions</span><span class="tx-hdr-icon">🔗</span>
+        </div>
+        <div class="tx-body">
+          <div class="tx-row"><span class="tx-label">Success</span><span class="tx-val s">0</span></div>
+          <div class="tx-row"><span class="tx-label">Failed</span><span class="tx-val d">0</span></div>
+          <div class="tx-row"><span class="tx-label">Queued</span><span class="tx-val m">0</span></div>
+          <div class="tx-row"><span class="tx-label">Pending Bal. Validation</span><span class="tx-val m">0</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-section">
+      <div class="chart-hdr">
+        <h2>📈 Daily Transaction Volume — Last 7 Days</h2>
+        <div class="legend">
+          <div class="leg">
+            <div class="leg-dot" style="background:#16A34A"></div>Success
+          </div>
+          <div class="leg">
+            <div class="leg-dot" style="background:#DC2626"></div>Failed
+          </div>
+          <div class="leg">
+            <div class="leg-dot" style="background:#D97706"></div>Queued
+          </div>
+        </div>
+      </div>
+      <canvas id="trendChart" height="90"></canvas>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2026 &nbsp;<strong>NLS Tech Solutions Ltd</strong>&nbsp; | &nbsp;H2H Transaction Processing System
+    &nbsp;|&nbsp; All rights reserved.
+  </footer>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB');
+      document.getElementById('dateTxt').textContent = now.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('reportDate').textContent = 'Report Date: ' + now.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('reportBadge').textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    updateClock(); setInterval(updateClock, 1000);
+
+    const labels = ['24 Feb', '25 Feb', '26 Feb', '27 Feb', '28 Feb', '01 Mar', '02 Mar'];
+    new Chart(document.getElementById('trendChart').getContext('2d'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Success', data: [198, 210, 217, 203, 225, 190, 217], borderColor: '#16A34A', backgroundColor: 'rgba(22,163,74,0.07)', fill: true, tension: 0.42, pointRadius: 5, pointBackgroundColor: '#16A34A', borderWidth: 2.5 },
+          { label: 'Failed', data: [3, 1, 2, 0, 1, 2, 1], borderColor: '#DC2626', backgroundColor: 'rgba(220,38,38,0.07)', fill: true, tension: 0.42, pointRadius: 5, pointBackgroundColor: '#DC2626', borderWidth: 2.5 },
+          { label: 'Queued', data: [0, 2, 0, 1, 0, 0, 0], borderColor: '#D97706', backgroundColor: 'rgba(217,119,6,0.07)', fill: true, tension: 0.42, pointRadius: 5, pointBackgroundColor: '#D97706', borderWidth: 2.5 },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: '#13121F', borderColor: 'rgba(40,105,229,0.4)', borderWidth: 1, titleColor: '#fff', bodyColor: '#6B7DAE', padding: 12 }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(19,18,31,0.06)' }, ticks: { color: '#6B7DAE', font: { size: 12 } }, border: { color: '#D6E2F5' } },
+          y: { beginAtZero: true, grid: { color: 'rgba(19,18,31,0.06)' }, ticks: { color: '#6B7DAE', font: { size: 12 } }, border: { color: '#D6E2F5' } }
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
